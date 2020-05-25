@@ -2,3 +2,5 @@
 auairtools.egg-info
 build
 dist
+*.tfrecord
+data/**/*.jpg
