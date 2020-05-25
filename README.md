@@ -1,4 +1,4 @@
-# AU-AIR Dataset API
+# Fork of AU-AIR Dataset API with TFRecord converter
 ## Dataset
 The AU-AIR is a multi-modal aerial dataset captured by a UAV. Having visual data, object annotations, and flight data (time, GPS, altitude, IMU sensor data, velocities), AU-AIR meets vision and robotics for UAVs.
 
