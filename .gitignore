@@ -4,3 +4,4 @@ build
 dist
 *.tfrecord
 data/**/*.jpg
+.vscode

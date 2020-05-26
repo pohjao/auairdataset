@@ -8,14 +8,12 @@ from absl.flags import FLAGS
 import tensorflow as tf
 import lxml.etree
 import tqdm
+import random
 
 flags.DEFINE_string('data_dir', './data/images/', 'path to auair images')
 flags.DEFINE_string('annotations', './data/annotations.json','annotations json-file')
-flags.DEFINE_enum('split', 'train', [
-                  'train', 'val'], 'specify train or val split')
-flags.DEFINE_string('output_filebase', './data/tfrecords/auair.tfrecord', 'output dataset')
-flags.DEFINE_integer('shards', '1', 'number of shards')
-
+flags.DEFINE_list('splits', '80,10,10', 'List of split percentages: train,val. Rest of the data is split into test set.')
+flags.DEFINE_string('output_filebase', './data/tfrecords', 'output location')
 
 def build_example(annotation, class_list):
     img_path = os.path.join(
@@ -68,28 +66,35 @@ def main(_argv):
 
     logging.info("Class mapping loaded: %s", annotations["categories"])
 
-    writer = tf.io.TFRecordWriter(FLAGS.output_filebase)
-    for annotation in annotations["annotations"]:
+    file_list = annotations["annotations"]
+    file_count = len(file_list)
+    random.shuffle(file_list)
+    splits = list(map(int,FLAGS.splits))
+
+    training_set = file_list[:int(file_count*(splits[0]/100))]
+    validation_set = file_list[len(training_set):len(training_set)+int(file_count*(splits[1]/100))]
+    test_set = file_list[len(validation_set)+len(training_set):]
+
+    writer = tf.io.TFRecordWriter(os.path.join(FLAGS.output_filebase,"train.tfrecord"))
+    for annotation in training_set:
+        tf_example = build_example(annotation, annotations["categories"])
+        writer.write(tf_example.SerializeToString())
+    writer.close()
+
+
+    writer = tf.io.TFRecordWriter(os.path.join(FLAGS.output_filebase,"validate.tfrecord"))
+    for annotation in validation_set:
+        tf_example = build_example(annotation, annotations["categories"])
+        writer.write(tf_example.SerializeToString())
+    writer.close()
+
+
+    writer = tf.io.TFRecordWriter(os.path.join(FLAGS.output_filebase,"test.tfrecord"))
+    for annotation in test_set:
         tf_example = build_example(annotation, annotations["categories"])
         writer.write(tf_example.SerializeToString())
     writer.close()
     logging.info("Done")
-
-
-    # writer = tf.io.TFRecordWriter(FLAGS.output_file)
-    # image_list = open(os.path.join(
-    #     FLAGS.data_dir, 'ImageSets', 'Main', 'aeroplane_%s.txt' % FLAGS.split)).read().splitlines()
-    # logging.info("Image list loaded: %d", len(image_list))
-    # for image in tqdm.tqdm(image_list):
-    #     name, _ = image.split()
-    #     annotation_xml = os.path.join(
-    #         FLAGS.data_dir, 'Annotations', name + '.xml')
-    #     annotation_xml = lxml.etree.fromstring(open(annotation_xml).read())
-    #     annotation = parse_xml(annotation_xml)['annotation']
-    #     tf_example = build_example(annotation, class_map)
-    #     writer.write(tf_example.SerializeToString())
-    # writer.close()
-    # logging.info("Done")
 
 
 if __name__ == '__main__':
