@@ -1,4 +1,30 @@
 # Fork of AU-AIR Dataset API with TFRecord converter
+## Changes made from the original repo
+* tfrecord exporting function
+* invalid bounding box filtering
+
+For TFRecord exporting see
+
+```
+python auairtools/to_tfrecord.py --helpshort
+```
+```
+auairtools/to_tfrecord.py:
+  --annotations: Path to annotations json-file
+    (default: './data/annotations.json')
+  --data_dir: Path to auair images directory
+    (default: './data/images/')
+  --output_dir: Output location.
+    (default: './data/tfrecords')
+  --splits: List of split percentages: train,val. Rest of the data is split into the test set.
+    (default: '80,10')
+    (a comma separated list)
+
+```
+
+The output consists of train, val and test datasets. Class namefile is also exported.
+
+
 ## Dataset
 The AU-AIR is a multi-modal aerial dataset captured by a UAV. Having visual data, object annotations, and flight data (time, GPS, altitude, IMU sensor data, velocities), AU-AIR meets vision and robotics for UAVs.
 
