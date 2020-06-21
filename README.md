@@ -1,6 +1,7 @@
 # Fork of AU-AIR Dataset API with TFRecord converter
 ## Changes made from the original repo
 * tfrecord exporting function
+* YOLO-format exporting function
 * invalid bounding box filtering
 
 For TFRecord exporting see

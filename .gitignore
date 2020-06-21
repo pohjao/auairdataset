@@ -5,3 +5,4 @@ dist
 *.tfrecord
 data/**/*.jpg
 .vscode
+**/yololabels/*.txt
